@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'hidden_text_field.dart'; // Import your custom HiddenTextField widget
+import 'package:late_solver/letter_grid.dart';
+import 'hidden_text_field.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +15,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(),
+      // home: Scaffold(
+      //   body: Padding(
+      //     padding: EdgeInsets.only(top: 120.0),
+      //     child: LetterGrid(),
+      //   ),
+      // ),
     );
   }
 }
@@ -38,17 +45,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Center(
-          child: HiddenTextField(
-            // Use the HiddenTextField widget here
-            onKeyboardPresented: () {
-              setState(() {
-                isKeyboardPresented = true;
-              });
-            },
-          ),
-        ),
+      body: Padding(
+        padding: EdgeInsets.only(top: 120.0), // Add padding on top
+        child: LetterGrid(),
       ),
     );
   }

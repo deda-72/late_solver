@@ -35,6 +35,19 @@ class _HiddenTextFieldState extends State<HiddenTextField> {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return TextField(
+  //     focusNode: _focusNode,
+  //     style: TextStyle(color: Colors.transparent),
+  //     cursorColor: Colors.transparent,
+  //     decoration: InputDecoration(
+  //       border: InputBorder.none,
+  //     ),
+  //     showCursor: false,
+  //     autofocus: true,
+  //   );
+  // }
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -42,9 +55,10 @@ class _HiddenTextFieldState extends State<HiddenTextField> {
       style: TextStyle(color: Colors.transparent),
       cursorColor: Colors.transparent,
       decoration: InputDecoration(
+        labelText: 'Your Label', // This is the label
         border: InputBorder.none,
       ),
-      showCursor: false,
+      showCursor: true,
       autofocus: true,
     );
   }
