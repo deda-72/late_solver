@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'hidden_text_field.dart'; // Import your custom HiddenTextField widget
 
 void main() {
   runApp(MyApp());
@@ -23,66 +24,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> labels = ['', '', '', '', ''];
-  TextEditingController _controller = TextEditingController();
+  bool isKeyboardPresented = false; // Track if keyboard is presented
 
-  void updateLabels(String text) {
-    setState(() {
-      for (int i = 0; i < labels.length; i++) {
-        if (i < text.length) {
-          labels[i] = text[i];
-        } else {
-          labels[i] = '';
-        }
-      }
+  @override
+  void initState() {
+    super.initState();
+    // Request focus on the hidden TextField when the app starts
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      // FocusScope.of(context).requestFocus(_focusNode);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Device Keyboard and Labels Demo'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(5, (index) {
-                return Container(
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue),
-                  ),
-                  child: Text(labels[index]),
-                );
-              }),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _controller,
-              maxLength: 5,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Enter text',
-              ),
-              onChanged: (text) {
-                updateLabels(text);
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  labels = ['', '', '', '', ''];
-                  _controller.clear();
-                });
-              },
-              child: Text('Clear'),
-            ),
-          ],
+      body: Container(
+        child: Center(
+          child: HiddenTextField(
+            // Use the HiddenTextField widget here
+            onKeyboardPresented: () {
+              setState(() {
+                isKeyboardPresented = true;
+              });
+            },
+          ),
         ),
       ),
     );
