@@ -45,6 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Late Solver'),
+        centerTitle: true,
+        backgroundColor: Colors.amber,
+      ),
       body: Padding(
         padding: EdgeInsets.only(top: 120.0), // Add padding on top
         child: LetterGrid(),
