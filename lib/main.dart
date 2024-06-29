@@ -19,13 +19,15 @@ class LetterRowScreen extends StatefulWidget {
 }
 
 class _LetterRowScreenState extends State<LetterRowScreen> {
-  List<String> letters = List.generate(5, (_) => '');
+  List<List<String>> rows =
+      List.generate(6, (_) => List.generate(5, (_) => ''));
+  int currentRow = 0; // Keep track of the current row being edited
   bool isFixed = false;
 
-  void updateLetter(int index, String letter) {
+  void updateLetter(int rowIndex, int colIndex, String letter) {
     if (!isFixed) {
       setState(() {
-        letters[index] = letter;
+        rows[rowIndex][colIndex] = letter;
       });
     }
   }
@@ -33,9 +35,9 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
   void removeLetter() {
     if (!isFixed) {
       setState(() {
-        for (int i = letters.length - 1; i >= 0; i--) {
-          if (letters[i].isNotEmpty) {
-            letters[i] = '';
+        for (int colIndex = 4; colIndex >= 0; colIndex--) {
+          if (rows[currentRow][colIndex].isNotEmpty) {
+            rows[currentRow][colIndex] = '';
             break;
           }
         }
@@ -44,7 +46,7 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
   }
 
   void submit() {
-    if (letters.contains('')) {
+    if (rows[currentRow].contains('')) {
       return; // Do not commit if less than 5 letters entered
     }
 
@@ -57,41 +59,69 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
 
   void onEnterPressed() {
     // Future function to be defined here
-    print("Letters fixed: ${letters.join()}");
+    print("Row ${currentRow + 1} fixed: ${rows[currentRow].join()}");
+    // Move to the next row after submitting
+    if (currentRow < rows.length - 1) {
+      setState(() {
+        currentRow++;
+        isFixed = false; // Reset the fixed state for the next row
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Letter Row'),
+        title: Text('WORDL Late Solver'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
           Expanded(
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(5, (index) {
-                  return Container(
-                    margin: EdgeInsets.all(4.0),
-                    padding: EdgeInsets.all(16.0),
-                    color: Colors.blue[100],
-                    child: Text(
-                      letters[index],
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  );
-                }),
-              ),
+            child: ListView.builder(
+              itemCount: rows.length,
+              itemBuilder: (context, rowIndex) {
+                return Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(5, (colIndex) {
+                      return Container(
+                        width: 60.0, // Fixed width
+                        height: 60.0, // Fixed height to make it square
+                        margin: EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white, // White background
+                          border: Border.all(
+                            color: Colors.black, // Black border
+                            width: 2.0, // Border width
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(8.0), // Rounded corners
+                        ),
+                        child: Center(
+                          child: Text(
+                            rows[rowIndex][colIndex],
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              },
             ),
           ),
           Keyboard(
             onLetterSelected: (letter) {
-              for (int i = 0; i < letters.length; i++) {
-                if (letters[i].isEmpty) {
-                  updateLetter(i, letter);
-                  break;
+              if (!isFixed && currentRow < rows.length) {
+                for (int i = 0; i < rows[currentRow].length; i++) {
+                  if (rows[currentRow][i].isEmpty) {
+                    updateLetter(currentRow, i, letter);
+                    break;
+                  }
                 }
               }
             },
@@ -125,8 +155,10 @@ class Keyboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double keyWidth =
-            (constraints.maxWidth - 25) / 10 * 0.9; // 10 keys per row
+        // Define key size based on screen width
+        double keyWidth = (constraints.maxWidth - 20) /
+            10 *
+            0.8; // Decrease key width by factor 0.8
         double keyHeight = 40.0;
 
         return Container(
@@ -180,7 +212,7 @@ class Keyboard extends StatelessWidget {
         child: Center(
           child: Text(
             letter,
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 20),
           ),
         ),
       ),
