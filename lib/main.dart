@@ -23,6 +23,7 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
       List.generate(6, (_) => List.generate(5, (_) => ''));
   int currentRow = 0; // Keep track of the current row being edited
   bool isFixed = false;
+  DateTime? selectedDate;
 
   void updateLetter(int rowIndex, int colIndex, String letter) {
     if (!isFixed) {
@@ -69,6 +70,19 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
     }
   }
 
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,19 +93,29 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
       ),
       body: Column(
         children: [
+          ElevatedButton(
+            onPressed: () => selectDate(context),
+            child: Text(
+              selectedDate == null
+                  ? 'Select date'
+                  : '${selectedDate!.toLocal()}'.split(' ')[0],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: rows.length,
               itemBuilder: (context, rowIndex) {
                 return Container(
-                  margin: EdgeInsets.symmetric(vertical: 8.0),
+                  margin: EdgeInsets.symmetric(
+                      vertical: 4.0), // Reduce space between rows
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(5, (colIndex) {
                       return Container(
                         width: 55.0, // Fixed width
                         height: 55.0, // Fixed height to make it square
-                        margin: EdgeInsets.all(4.0),
+                        margin:
+                            EdgeInsets.all(2.0), // Reduce space between cells
                         decoration: BoxDecoration(
                           color: Colors.white, // White background
                           border: Border.all(
@@ -158,7 +182,7 @@ class Keyboard extends StatelessWidget {
         // Define key size based on screen width
         double keyWidth = (constraints.maxWidth - 20) /
             10 *
-            0.9; // Decrease key width by factor 0.8
+            0.9; // Decrease key width by factor 0.9
         double keyHeight = 40.0;
 
         return Container(
@@ -195,7 +219,7 @@ class Keyboard extends StatelessWidget {
     return GestureDetector(
       onTap: () => onLetterSelected(letter),
       child: Container(
-        margin: EdgeInsets.all(2.0),
+        margin: EdgeInsets.all(1.0), // Reduce space between keys
         width: width,
         height: height,
         decoration: BoxDecoration(
@@ -225,7 +249,7 @@ class Keyboard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.all(1.0),
+        margin: EdgeInsets.all(1.0), // Reduce space between keys
         width: width * 1.5, // Special keys are 1.5 times wider
         height: height,
         decoration: BoxDecoration(
