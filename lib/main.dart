@@ -73,7 +73,7 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('WORDL Late Solver'),
+        title: Text('WORDLE Late Solver'),
         centerTitle: true,
         backgroundColor: Colors.blue,
       ),
@@ -89,14 +89,14 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(5, (colIndex) {
                       return Container(
-                        width: 60.0, // Fixed width
-                        height: 60.0, // Fixed height to make it square
+                        width: 55.0, // Fixed width
+                        height: 55.0, // Fixed height to make it square
                         margin: EdgeInsets.all(4.0),
                         decoration: BoxDecoration(
                           color: Colors.white, // White background
                           border: Border.all(
                             color: Colors.black, // Black border
-                            width: 2.0, // Border width
+                            width: 1.0, // Border width
                           ),
                           borderRadius:
                               BorderRadius.circular(8.0), // Rounded corners
@@ -158,7 +158,7 @@ class Keyboard extends StatelessWidget {
         // Define key size based on screen width
         double keyWidth = (constraints.maxWidth - 20) /
             10 *
-            0.8; // Decrease key width by factor 0.8
+            0.9; // Decrease key width by factor 0.8
         double keyHeight = 40.0;
 
         return Container(
@@ -225,7 +225,7 @@ class Keyboard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.all(2.0),
+        margin: EdgeInsets.all(1.0),
         width: width * 1.5, // Special keys are 1.5 times wider
         height: height,
         decoration: BoxDecoration(
