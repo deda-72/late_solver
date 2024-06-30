@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'word_processor.dart'; // Import the file containing fetchAndProcessWords
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: LetterRowScreen(),
     );
   }
 }
 
 class LetterRowScreen extends StatefulWidget {
+  const LetterRowScreen({super.key});
+
   @override
   _LetterRowScreenState createState() => _LetterRowScreenState();
 }
@@ -21,9 +26,23 @@ class LetterRowScreen extends StatefulWidget {
 class _LetterRowScreenState extends State<LetterRowScreen> {
   List<List<String>> rows =
       List.generate(6, (_) => List.generate(5, (_) => ''));
-  int currentRow = 0; // Keep track of the current row being edited
+  int currentRow = 0;
   bool isFixed = false;
   DateTime? selectedDate;
+  List<String>? upperCaseWords; // List to store the fetched words
+
+  @override
+  void initState() {
+    super.initState();
+    fetchWords(); // Fetch words when the widget is initialized
+  }
+
+  void fetchWords() async {
+    List<String> words = await fetchAndProcessWords();
+    setState(() {
+      upperCaseWords = words;
+    });
+  }
 
   void updateLetter(int rowIndex, int colIndex, String letter) {
     if (!isFixed) {
@@ -48,26 +67,45 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
 
   void submit() {
     if (rows[currentRow].contains('')) {
-      return; // Do not commit if less than 5 letters entered
+      return;
     }
 
-    setState(() {
-      isFixed = true;
-    });
-    // Reserve for future function
     onEnterPressed();
   }
 
   void onEnterPressed() {
-    // Future function to be defined here
-    print("Row ${currentRow + 1} fixed: ${rows[currentRow].join()}");
-    // Move to the next row after submitting
-    if (currentRow < rows.length - 1) {
-      setState(() {
+    final currentWord = rows[currentRow].join();
+
+    if (currentWord.length < 5 ||
+        (upperCaseWords != null && !upperCaseWords!.contains(currentWord))) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Invalid Word"),
+            content: const Text("Not a valid word"),
+            actions: [
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    setState(() {
+      isFixed = true; // Only fix the row if the word is valid
+      print("Row ${currentRow + 1} fixed: $currentWord");
+      if (currentRow < rows.length - 1) {
         currentRow++;
         isFixed = false; // Reset the fixed state for the next row
-      });
-    }
+      }
+    });
   }
 
   Future<void> selectDate(BuildContext context) async {
@@ -77,17 +115,18 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
       });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('WORDLE Late Solver'),
+        title: const Text('WORDLE Late Solver'),
         centerTitle: true,
         backgroundColor: Colors.blue,
       ),
@@ -106,29 +145,26 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
               itemCount: rows.length,
               itemBuilder: (context, rowIndex) {
                 return Container(
-                  margin: EdgeInsets.symmetric(
-                      vertical: 4.0), // Reduce space between rows
+                  margin: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(5, (colIndex) {
                       return Container(
-                        width: 55.0, // Fixed width
-                        height: 55.0, // Fixed height to make it square
-                        margin:
-                            EdgeInsets.all(2.0), // Reduce space between cells
+                        width: 55.0,
+                        height: 55.0,
+                        margin: const EdgeInsets.all(2.0),
                         decoration: BoxDecoration(
-                          color: Colors.white, // White background
+                          color: Colors.white,
                           border: Border.all(
-                            color: Colors.black, // Black border
-                            width: 1.0, // Border width
+                            color: Colors.black,
+                            width: 1.0,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(8.0), // Rounded corners
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Center(
                           child: Text(
                             rows[rowIndex][colIndex],
-                            style: TextStyle(fontSize: 24),
+                            style: const TextStyle(fontSize: 24),
                           ),
                         ),
                       );
@@ -164,6 +200,7 @@ class Keyboard extends StatelessWidget {
   final VoidCallback onEnter;
 
   Keyboard({
+    super.key,
     required this.onLetterSelected,
     required this.onBackspace,
     required this.onEnter,
@@ -179,15 +216,12 @@ class Keyboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Define key size based on screen width
-        double keyWidth = (constraints.maxWidth - 20) /
-            10 *
-            0.9; // Decrease key width by factor 0.9
+        double keyWidth = (constraints.maxWidth - 20) / 10 * 0.9;
         double keyHeight = 40.0;
 
         return Container(
           color: Colors.grey[200],
-          padding: EdgeInsets.symmetric(vertical: 10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -198,7 +232,7 @@ class Keyboard extends StatelessWidget {
                     return _buildKey(letter, keyWidth, keyHeight);
                   }).toList(),
                 );
-              }).toList(),
+              }),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -219,13 +253,13 @@ class Keyboard extends StatelessWidget {
     return GestureDetector(
       onTap: () => onLetterSelected(letter),
       child: Container(
-        margin: EdgeInsets.all(1.0), // Reduce space between keys
+        margin: const EdgeInsets.all(1.0),
         width: width,
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(5.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 2.0,
@@ -236,7 +270,7 @@ class Keyboard extends StatelessWidget {
         child: Center(
           child: Text(
             letter,
-            style: TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
           ),
         ),
       ),
@@ -249,13 +283,13 @@ class Keyboard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.all(1.0), // Reduce space between keys
-        width: width * 1.5, // Special keys are 1.5 times wider
+        margin: const EdgeInsets.all(1.0),
+        width: width * 1.5,
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(5.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               blurRadius: 2.0,
@@ -267,7 +301,7 @@ class Keyboard extends StatelessWidget {
           child: text != null
               ? Text(
                   text,
-                  style: TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20),
                 )
               : Icon(
                   icon,
