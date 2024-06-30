@@ -1,125 +1,280 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page test'),
+      home: LetterRowScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class LetterRowScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _LetterRowScreenState createState() => _LetterRowScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LetterRowScreenState extends State<LetterRowScreen> {
+  List<List<String>> rows =
+      List.generate(6, (_) => List.generate(5, (_) => ''));
+  int currentRow = 0; // Keep track of the current row being edited
+  bool isFixed = false;
+  DateTime? selectedDate;
 
-  void _incrementCounter() {
+  void updateLetter(int rowIndex, int colIndex, String letter) {
+    if (!isFixed) {
+      setState(() {
+        rows[rowIndex][colIndex] = letter;
+      });
+    }
+  }
+
+  void removeLetter() {
+    if (!isFixed) {
+      setState(() {
+        for (int colIndex = 4; colIndex >= 0; colIndex--) {
+          if (rows[currentRow][colIndex].isNotEmpty) {
+            rows[currentRow][colIndex] = '';
+            break;
+          }
+        }
+      });
+    }
+  }
+
+  void submit() {
+    if (rows[currentRow].contains('')) {
+      return; // Do not commit if less than 5 letters entered
+    }
+
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      isFixed = true;
     });
+    // Reserve for future function
+    onEnterPressed();
+  }
+
+  void onEnterPressed() {
+    // Future function to be defined here
+    print("Row ${currentRow + 1} fixed: ${rows[currentRow].join()}");
+    // Move to the next row after submitting
+    if (currentRow < rows.length - 1) {
+      setState(() {
+        currentRow++;
+        isFixed = false; // Reset the fixed state for the next row
+      });
+    }
+  }
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('WORDLE Late Solver'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () => selectDate(context),
+            child: Text(
+              selectedDate == null
+                  ? 'Select date'
+                  : '${selectedDate!.toLocal()}'.split(' ')[0],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: rows.length,
+              itemBuilder: (context, rowIndex) {
+                return Container(
+                  margin: EdgeInsets.symmetric(
+                      vertical: 4.0), // Reduce space between rows
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(5, (colIndex) {
+                      return Container(
+                        width: 55.0, // Fixed width
+                        height: 55.0, // Fixed height to make it square
+                        margin:
+                            EdgeInsets.all(2.0), // Reduce space between cells
+                        decoration: BoxDecoration(
+                          color: Colors.white, // White background
+                          border: Border.all(
+                            color: Colors.black, // Black border
+                            width: 1.0, // Border width
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(8.0), // Rounded corners
+                        ),
+                        child: Center(
+                          child: Text(
+                            rows[rowIndex][colIndex],
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              },
+            ),
+          ),
+          Keyboard(
+            onLetterSelected: (letter) {
+              if (!isFixed && currentRow < rows.length) {
+                for (int i = 0; i < rows[currentRow].length; i++) {
+                  if (rows[currentRow][i].isEmpty) {
+                    updateLetter(currentRow, i, letter);
+                    break;
+                  }
+                }
+              }
+            },
+            onBackspace: removeLetter,
+            onEnter: submit,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Keyboard extends StatelessWidget {
+  final Function(String) onLetterSelected;
+  final VoidCallback onBackspace;
+  final VoidCallback onEnter;
+
+  Keyboard({
+    required this.onLetterSelected,
+    required this.onBackspace,
+    required this.onEnter,
+  });
+
+  final List<String> qwertyRows = [
+    'QWERTYUIOP',
+    'ASDFGHJKL',
+    'ZXCVBNM',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Define key size based on screen width
+        double keyWidth = (constraints.maxWidth - 20) /
+            10 *
+            0.9; // Decrease key width by factor 0.9
+        double keyHeight = 40.0;
+
+        return Container(
+          color: Colors.grey[200],
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...qwertyRows.map((row) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: row.split('').map((letter) {
+                    return _buildKey(letter, keyWidth, keyHeight);
+                  }).toList(),
+                );
+              }).toList(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSpecialKey(
+                      Icons.backspace, onBackspace, keyWidth, keyHeight),
+                  _buildSpecialKey(Icons.check, onEnter, keyWidth, keyHeight,
+                      text: 'Enter'),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildKey(String letter, double width, double height) {
+    return GestureDetector(
+      onTap: () => onLetterSelected(letter),
+      child: Container(
+        margin: EdgeInsets.all(1.0), // Reduce space between keys
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 2.0,
+              offset: Offset(0, 2),
             ),
           ],
         ),
+        child: Center(
+          child: Text(
+            letter,
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildSpecialKey(
+      IconData icon, VoidCallback onTap, double width, double height,
+      {String? text}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.all(1.0), // Reduce space between keys
+        width: width * 1.5, // Special keys are 1.5 times wider
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 2.0,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: text != null
+              ? Text(
+                  text,
+                  style: TextStyle(fontSize: 20),
+                )
+              : Icon(
+                  icon,
+                  size: 24,
+                ),
+        ),
+      ),
     );
   }
 }
