@@ -16,7 +16,7 @@ void main() {
     );
 
     await Zone.current.fork(specification: spec).run(() async {
-      List<List<String>> words = await fetchAndProcessCSV();
+      List<List<String>> words = await readCSV();
 
       // Print the fetched words
       for (var wordPair in words) {

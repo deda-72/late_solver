@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'word_processor.dart'; // Import the file containing fetchAndProcessWords
+import 'wordle_arch.dart'; // Import the file containing readCSV
 
 void main() {
   runApp(const MyApp());
@@ -29,12 +30,14 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
   int currentRow = 0;
   bool isFixed = false;
   DateTime? selectedDate;
-  List<String>? upperCaseWords; // List to store the fetched words
+  List<String>? upperCaseWords;
+  Map<String, String>? dateToStringMap; // Map to store date to string mapping
 
   @override
   void initState() {
     super.initState();
     fetchWords(); // Fetch words when the widget is initialized
+    loadCSVData(); // Load CSV data when the widget is initialized
   }
 
   void fetchWords() async {
@@ -42,6 +45,24 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
     setState(() {
       upperCaseWords = words;
     });
+  }
+
+  void loadCSVData() async {
+    try {
+      final data = await readCSV();
+      final map = <String, String>{};
+      for (var entry in data) {
+        if (entry.length >= 2) {
+          map[entry[0]] = entry[1];
+        }
+      }
+      setState(() {
+        dateToStringMap = map;
+      });
+      print("CSV Data Loaded: $dateToStringMap"); // Debug print
+    } catch (e) {
+      print('Failed to load CSV data: $e');
+    }
   }
 
   void updateLetter(int rowIndex, int colIndex, String letter) {
@@ -118,8 +139,60 @@ class _LetterRowScreenState extends State<LetterRowScreen> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        final dateKey = _formatDate(picked);
+        print("Selected Date Key: $dateKey"); // Debug print
+
+        final stringValue = dateToStringMap?[dateKey];
+        print("Available Date Keys: ${dateToStringMap?.keys}"); // Debug print
+
+        if (stringValue != null) {
+          // Display the value if available
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("WORD Available"),
+                content: Text(
+                    'For selected date $dateKey, the value is: $stringValue'),
+                actions: [
+                  TextButton(
+                    child: const Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Show message if the date is not found
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("WORD Not Available"),
+                content: const Text(
+                    "The WORD is not available for the selected date"),
+                actions: [
+                  TextButton(
+                    child: const Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       });
     }
+  }
+
+  String _formatDate(DateTime date) {
+    // Format date as M/D/YYYY to match CSV data
+    return '${date.month}/${date.day}/${date.year}';
   }
 
   @override
