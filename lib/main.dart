@@ -80,33 +80,38 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   }
 
   void _handleKeyPress(String letter) {
-    setState(() {
-      if (_currentRow < 6 && _currentCol < 5) {
-        _letters[_currentRow][_currentCol] = letter;
-        _currentCol++;
-        if (_currentCol >= 5) {
-          _currentCol = 0;
-          _currentRow++;
+    if (_currentRow < 6) {
+      setState(() {
+        if (_currentCol < 5) {
+          _letters[_currentRow][_currentCol] = letter;
+          _currentCol++;
         }
-      }
-    });
+      });
+    }
   }
 
   void _handleBackspace() {
     setState(() {
       if (_currentCol > 0) {
+        // Clear the letter in the current column of the current row
         _currentCol--;
-      } else if (_currentRow > 0) {
-        _currentRow--;
-        _currentCol = 4; // Move to the last column of the previous row
+        _letters[_currentRow][_currentCol] = null;
       }
-      _letters[_currentRow][_currentCol] = null; // Clear the letter
     });
   }
 
   void _handleEnter() {
-    // Implement what happens when Enter is pressed, e.g., submit the row or perform an action
-    print('Enter pressed');
+    setState(() {
+      if (_currentCol >= 5) {
+        // Move to the next row if Enter is pressed and the current row is filled
+        if (_currentRow < 5) {
+          // Ensure there are more rows to move to
+          _currentRow++;
+          _currentCol = 0; // Reset to the first column of the next row
+        }
+      }
+      // Additional conditions for Enter can be added here in the future
+    });
   }
 
   @override
