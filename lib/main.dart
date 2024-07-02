@@ -62,7 +62,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
 
   Future<void> _loadWordList() async {
     final url =
-        'https://example.com/path/to/wordlist.txt'; // Replace with your GitHub raw file URL
+        'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/Possible_guesses.txt'; // Replace with your GitHub raw file URL
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -142,6 +142,21 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           }
         } else {
           print('Word "$currentRowWord" is not in the list.');
+          // Show SnackBar with the invalid word message and an OK button
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Invalid Word !!!'),
+              backgroundColor: Colors.red, // Optional: to highlight the error
+              action: SnackBarAction(
+                label: 'OK',
+                textColor: Colors
+                    .white, // Optional: to change the text color of the button
+                onPressed: () {
+                  // SnackBar will automatically dismiss when the button is pressed
+                },
+              ),
+            ),
+          );
         }
       }
     });
