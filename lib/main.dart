@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'wordle_arch.dart'; // Import the wordle_arch.dart file
 
 void main() => runApp(MyApp());
@@ -23,7 +24,6 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   String? word2solve;
   bool _isLoading = true;
 
-  // State to track letters in each widget (6 rows x 5 columns)
   List<List<String?>> _letters = List.generate(
     6,
     (_) => List.generate(5, (_) => null),
@@ -31,11 +31,13 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
 
   int _currentRow = 0;
   int _currentCol = 0;
+  List<String> _wordList = [];
 
   @override
   void initState() {
     super.initState();
     _initializeDates();
+    _loadWordList(); // Load word list on initialization
   }
 
   Future<void> _initializeDates() async {
@@ -55,6 +57,29 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadWordList() async {
+    final url =
+        'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/Possible_guesses.txt'; // Replace with your GitHub raw file URL
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Process the response body
+        setState(() {
+          _wordList = response.body
+              .split('\n')
+              .map((line) =>
+                  line.trim().toUpperCase()) // Convert each line to uppercase
+              .toList();
+          print('Word ${1 + 1}: ${_wordList[1]}');
+        });
+      } else {
+        print('Failed to load word list.');
+      }
+    } catch (e) {
+      print('Error fetching word list: $e');
     }
   }
 
@@ -93,7 +118,6 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   void _handleBackspace() {
     setState(() {
       if (_currentCol > 0) {
-        // Clear the letter in the current column of the current row
         _currentCol--;
         _letters[_currentRow][_currentCol] = null;
       }
@@ -103,14 +127,19 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   void _handleEnter() {
     setState(() {
       if (_currentCol >= 5) {
-        // Move to the next row if Enter is pressed and the current row is filled
-        if (_currentRow < 5) {
-          // Ensure there are more rows to move to
-          _currentRow++;
-          _currentCol = 0; // Reset to the first column of the next row
+        String currentRowWord = _letters[_currentRow].join();
+        if (_wordList.contains(currentRowWord)) {
+          print('Word "$currentRowWord" is in the list.');
+          // Move to the next row if Enter is pressed and the current row is filled
+          if (_currentRow < 5) {
+            // Ensure there are more rows to move to
+            _currentRow++;
+            _currentCol = 0; // Reset to the first column of the next row
+          }
+        } else {
+          print('Word "$currentRowWord" is not in the list.');
         }
       }
-      // Additional conditions for Enter can be added here in the future
     });
   }
 
