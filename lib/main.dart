@@ -1,387 +1,92 @@
 import 'package:flutter/material.dart';
-import 'word_processor.dart'; // Import the file containing fetchAndProcessWords
-import 'wordle_arch.dart'; // Import the file containing readCSV
+import 'wordle_arch.dart'; // Import the wordle_arch.dart file
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: LetterRowScreen(),
+    return MaterialApp(
+      home: DatePickerScreen(),
     );
   }
 }
 
-class LetterRowScreen extends StatefulWidget {
-  const LetterRowScreen({super.key});
-
+class DatePickerScreen extends StatefulWidget {
   @override
-  _LetterRowScreenState createState() => _LetterRowScreenState();
+  _DatePickerScreenState createState() => _DatePickerScreenState();
 }
 
-class _LetterRowScreenState extends State<LetterRowScreen> {
-  List<List<String>> rows =
-      List.generate(6, (_) => List.generate(5, (_) => ''));
-  int currentRow = 0;
-  bool isFixed = false;
-  DateTime? selectedDate;
-  List<String>? upperCaseWords;
-  Map<String, String>? dateToStringMap; // Map to store date to string mapping
+class _DatePickerScreenState extends State<DatePickerScreen> {
+  DateTime _selectedDate = DateTime.now(); // Initial date
+  List<DateTime> _activeDates = [];
+  String? word2solve;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchWords(); // Fetch words when the widget is initialized
-    loadCSVData(); // Load CSV data when the widget is initialized
+    _initializeDates();
   }
 
-  void fetchWords() async {
-    List<String> words = await fetchAndProcessWords();
-    setState(() {
-      upperCaseWords = words;
-    });
-  }
-
-  void loadCSVData() async {
+  Future<void> _initializeDates() async {
     try {
-      final data = await readCSV();
-      final map = <String, String>{};
-      for (var entry in data) {
-        if (entry.length >= 2) {
-          map[entry[0]] = entry[1];
-        }
-      }
+      DateTime latestDate = await getLatestDate();
+      List<DateTime> activeDates = await getActiveDates();
+      String? initialWord = await getWordForDate(latestDate);
       setState(() {
-        dateToStringMap = map;
+        _selectedDate = latestDate;
+        _activeDates = activeDates;
+        word2solve = initialWord;
+        _isLoading = false;
       });
-      print("CSV Data Loaded: $dateToStringMap"); // Debug print
+      print('Initial word for latest date: $word2solve');
     } catch (e) {
-      print('Failed to load CSV data: $e');
-    }
-  }
-
-  void updateLetter(int rowIndex, int colIndex, String letter) {
-    if (!isFixed) {
+      print('Failed to load date: $e');
       setState(() {
-        rows[rowIndex][colIndex] = letter;
+        _isLoading = false;
       });
     }
   }
 
-  void removeLetter() {
-    if (!isFixed) {
-      setState(() {
-        for (int colIndex = 4; colIndex >= 0; colIndex--) {
-          if (rows[currentRow][colIndex].isNotEmpty) {
-            rows[currentRow][colIndex] = '';
-            break;
-          }
-        }
-      });
-    }
-  }
-
-  void submit() {
-    if (rows[currentRow].contains('')) {
-      return;
-    }
-
-    onEnterPressed();
-  }
-
-  void onEnterPressed() {
-    final currentWord = rows[currentRow].join();
-
-    if (currentWord.length < 5 ||
-        (upperCaseWords != null && !upperCaseWords!.contains(currentWord))) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Invalid Word"),
-            content: const Text("Not a valid word"),
-            actions: [
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    setState(() {
-      isFixed = true; // Only fix the row if the word is valid
-      print("Row ${currentRow + 1} fixed: $currentWord");
-      if (currentRow < rows.length - 1) {
-        currentRow++;
-        isFixed = false; // Reset the fixed state for the next row
-      }
-    });
-  }
-
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
+      initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      selectableDayPredicate: (DateTime date) {
+        return _activeDates.contains(date);
+      },
     );
-    if (picked != null && picked != selectedDate) {
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      String? word = await getWordForDate(pickedDate);
       setState(() {
-        selectedDate = picked;
-        final dateKey = _formatDate(picked);
-        print("Selected Date Key: $dateKey"); // Debug print
-
-        final stringValue = dateToStringMap?[dateKey];
-        print("Available Date Keys: ${dateToStringMap?.keys}"); // Debug print
-
-        if (stringValue != null) {
-          // Display the value if available
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("WORD Available"),
-                content: Text(
-                    'For selected date $dateKey, the value is: $stringValue'),
-                actions: [
-                  TextButton(
-                    child: const Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          // Show message if the date is not found
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("WORD Not Available"),
-                content: const Text(
-                    "The WORD is not available for the selected date"),
-                actions: [
-                  TextButton(
-                    child: const Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
+        _selectedDate = pickedDate;
+        word2solve = word;
       });
+      print('Word for selected date: $word2solve');
     }
-  }
-
-  String _formatDate(DateTime date) {
-    // Format date as M/D/YYYY to match CSV data
-    return '${date.month}/${date.day}/${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WORDLE Late Solver'),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
+        title: Text('Date Picker Example'),
       ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () => selectDate(context),
-            child: Text(
-              selectedDate == null
-                  ? 'Select date'
-                  : '${selectedDate!.toLocal()}'.split(' ')[0],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: rows.length,
-              itemBuilder: (context, rowIndex) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(5, (colIndex) {
-                      return Container(
-                        width: 55.0,
-                        height: 55.0,
-                        margin: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Center(
-                          child: Text(
-                            rows[rowIndex][colIndex],
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                );
-              },
-            ),
-          ),
-          Keyboard(
-            onLetterSelected: (letter) {
-              if (!isFixed && currentRow < rows.length) {
-                for (int i = 0; i < rows[currentRow].length; i++) {
-                  if (rows[currentRow][i].isEmpty) {
-                    updateLetter(currentRow, i, letter);
-                    break;
-                  }
-                }
-              }
-            },
-            onBackspace: removeLetter,
-            onEnter: submit,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Keyboard extends StatelessWidget {
-  final Function(String) onLetterSelected;
-  final VoidCallback onBackspace;
-  final VoidCallback onEnter;
-
-  Keyboard({
-    super.key,
-    required this.onLetterSelected,
-    required this.onBackspace,
-    required this.onEnter,
-  });
-
-  final List<String> qwertyRows = [
-    'QWERTYUIOP',
-    'ASDFGHJKL',
-    'ZXCVBNM',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double keyWidth = (constraints.maxWidth - 20) / 10 * 0.9;
-        double keyHeight = 40.0;
-
-        return Container(
-          color: Colors.grey[200],
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ...qwertyRows.map((row) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: row.split('').map((letter) {
-                    return _buildKey(letter, keyWidth, keyHeight);
-                  }).toList(),
-                );
-              }),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildSpecialKey(
-                      Icons.backspace, onBackspace, keyWidth, keyHeight),
-                  _buildSpecialKey(Icons.check, onEnter, keyWidth, keyHeight,
-                      text: 'Enter'),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildKey(String letter, double width, double height) {
-    return GestureDetector(
-      onTap: () => onLetterSelected(letter),
-      child: Container(
-        margin: const EdgeInsets.all(1.0),
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5.0),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 2.0,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            letter,
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSpecialKey(
-      IconData icon, VoidCallback onTap, double width, double height,
-      {String? text}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.all(1.0),
-        width: width * 1.5,
-        height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5.0),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 2.0,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: text != null
-              ? Text(
-                  text,
-                  style: const TextStyle(fontSize: 20),
-                )
-              : Icon(
-                  icon,
-                  size: 24,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Center(
+              child: ElevatedButton(
+                onPressed: () => _selectDate(context),
+                child: Text(
+                  '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
+                  style: TextStyle(fontSize: 16),
                 ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }
