@@ -142,9 +142,6 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           }
         } else {
           print('Word "$currentRowWord" is not in the list.');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid WORD')),
-          );
         }
       }
     });
