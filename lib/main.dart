@@ -78,14 +78,35 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: ElevatedButton(
-                onPressed: () => _selectDate(context),
-                child: Text(
-                  '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
-                  style: TextStyle(fontSize: 16),
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Add 6 rows of square widgets
+                for (int i = 0; i < 6; i++)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return Container(
+                        margin: EdgeInsets.all(
+                            4.0), // Reduced margin for better spacing
+                        width: 50.0, // Set the width of each square
+                        height: 50.0, // Set the height of each square
+                        decoration: BoxDecoration(
+                          border:
+                              Border.all(color: Colors.black), // Black border
+                        ),
+                      );
+                    }),
+                  ),
+                SizedBox(height: 20), // Space between the rows and the button
+                ElevatedButton(
+                  onPressed: () => _selectDate(context),
+                  child: Text(
+                    '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-              ),
+              ],
             ),
     );
   }
