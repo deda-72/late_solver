@@ -62,7 +62,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
 
   Future<void> _loadWordList() async {
     final url =
-        'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/Possible_guesses.txt'; // Replace with your GitHub raw file URL
+        'https://example.com/path/to/wordlist.txt'; // Replace with your GitHub raw file URL
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -73,7 +73,11 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
               .map((line) =>
                   line.trim().toUpperCase()) // Convert each line to uppercase
               .toList();
-          print('Word ${1 + 1}: ${_wordList[1]}');
+
+          // Print the first 5 words to the debug console
+          for (int i = 0; i < 5 && i < _wordList.length; i++) {
+            print('Word ${i + 1}: ${_wordList[i]}');
+          }
         });
       } else {
         print('Failed to load word list.');
@@ -138,6 +142,9 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           }
         } else {
           print('Word "$currentRowWord" is not in the list.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid WORD')),
+          );
         }
       }
     });
@@ -285,7 +292,6 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     }),
                   ),
                 ),
-                SizedBox(height: 4.0), // Space between letters and buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
