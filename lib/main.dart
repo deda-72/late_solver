@@ -23,6 +23,15 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   String? word2solve;
   bool _isLoading = true;
 
+  // State to track letters in each widget (6 rows x 5 columns)
+  List<List<String?>> _letters = List.generate(
+    6,
+    (_) => List.generate(5, (_) => null),
+  );
+
+  int _currentRow = 0;
+  int _currentCol = 0;
+
   @override
   void initState() {
     super.initState();
@@ -70,44 +79,221 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
     }
   }
 
+  void _handleKeyPress(String letter) {
+    setState(() {
+      if (_currentRow < 6 && _currentCol < 5) {
+        _letters[_currentRow][_currentCol] = letter;
+        _currentCol++;
+        if (_currentCol >= 5) {
+          _currentCol = 0;
+          _currentRow++;
+        }
+      }
+    });
+  }
+
+  void _handleBackspace() {
+    setState(() {
+      if (_currentCol > 0) {
+        _currentCol--;
+      } else if (_currentRow > 0) {
+        _currentRow--;
+        _currentCol = 4; // Move to the last column of the previous row
+      }
+      _letters[_currentRow][_currentCol] = null; // Clear the letter
+    });
+  }
+
+  void _handleEnter() {
+    // Implement what happens when Enter is pressed, e.g., submit the row or perform an action
+    print('Enter pressed');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Date Picker Example'),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Add 6 rows of square widgets
-                for (int i = 0; i < 6; i++)
-                  Row(
+      body: Column(
+        children: [
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      return Container(
-                        margin: EdgeInsets.all(
-                            4.0), // Reduced margin for better spacing
-                        width: 50.0, // Set the width of each square
-                        height: 50.0, // Set the height of each square
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.black), // Black border
+                    children: [
+                      // Add 6 rows of square widgets
+                      for (int i = 0; i < 6; i++)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(5, (index) {
+                            return Container(
+                              margin: EdgeInsets.all(
+                                  2.0), // Reduced margin for better spacing
+                              width: 40.0, // Reduced width of each square
+                              height: 40.0, // Reduced height of each square
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.black), // Black border
+                              ),
+                              child: Center(
+                                child: Text(
+                                  _letters[i][index] ??
+                                      '', // Display the letter if present
+                                  style: TextStyle(
+                                      fontSize: 16), // Reduced font size
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      SizedBox(
+                          height: 20), // Space between the rows and the button
+                      ElevatedButton(
+                        onPressed: () => _selectDate(context),
+                        child: Text(
+                          '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+          // QWERTY Keyboard at the bottom
+          Container(
+            color: Colors.grey[200], // Background color for the keyboard
+            padding: EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                // QWERTY rows
+                Container(
+                  alignment: Alignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 2.0, // Reduced spacing between keys
+                    runSpacing: 2.0, // Reduced spacing between rows
+                    children: List.generate(10, (index) {
+                      String letter = '';
+                      if (index < 10)
+                        letter = 'QWERTYUIOP'.substring(index, index + 1);
+                      return GestureDetector(
+                        onTap: () => _handleKeyPress(letter),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                          ),
+                          width: 30.0, // Reduced width of each key
+                          height: 30.0, // Reduced height of each key
+                          child: Text(
+                            letter,
+                            style: TextStyle(fontSize: 14), // Reduced font size
+                          ),
                         ),
                       );
                     }),
                   ),
-                SizedBox(height: 20), // Space between the rows and the button
-                ElevatedButton(
-                  onPressed: () => _selectDate(context),
-                  child: Text(
-                    '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
-                    style: TextStyle(fontSize: 16),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 2.0, // Reduced spacing between keys
+                    runSpacing: 2.0, // Reduced spacing between rows
+                    children: List.generate(9, (index) {
+                      String letter = '';
+                      if (index < 9)
+                        letter = 'ASDFGHJKL'.substring(index, index + 1);
+                      return GestureDetector(
+                        onTap: () => _handleKeyPress(letter),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                          ),
+                          width: 30.0, // Reduced width of each key
+                          height: 30.0, // Reduced height of each key
+                          child: Text(
+                            letter,
+                            style: TextStyle(fontSize: 14), // Reduced font size
+                          ),
+                        ),
+                      );
+                    }),
                   ),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 2.0, // Reduced spacing between keys
+                    runSpacing: 2.0, // Reduced spacing between rows
+                    children: List.generate(7, (index) {
+                      String letter = '';
+                      if (index < 7)
+                        letter = 'ZXCVBNM'.substring(index, index + 1);
+                      return GestureDetector(
+                        onTap: () => _handleKeyPress(letter),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                          ),
+                          width: 30.0, // Reduced width of each key
+                          height: 30.0, // Reduced height of each key
+                          child: Text(
+                            letter,
+                            style: TextStyle(fontSize: 14), // Reduced font size
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                SizedBox(height: 4.0), // Space between letters and buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Backspace button
+                    GestureDetector(
+                      onTap: _handleBackspace,
+                      child: Container(
+                        margin: EdgeInsets.all(4.0),
+                        width: 40.0, // Reduced width of the Backspace button
+                        height: 40.0, // Reduced height of the Backspace button
+                        color: Colors.grey[300],
+                        alignment: Alignment.center,
+                        child: Text(
+                          '⌫', // Backspace icon
+                          style: TextStyle(fontSize: 20), // Adjust font size
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                        width: 8.0), // Space between Backspace and Enter button
+                    // Enter button
+                    GestureDetector(
+                      onTap: _handleEnter,
+                      child: Container(
+                        margin: EdgeInsets.all(4.0),
+                        width: 80.0, // Reduced width of the Enter button
+                        height: 40.0, // Reduced height of the Enter button
+                        color: Colors.grey[300],
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Enter', // Enter text
+                          style: TextStyle(fontSize: 16), // Reduced font size
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+          ),
+        ],
+      ),
     );
   }
 }
