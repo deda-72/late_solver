@@ -33,6 +33,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   int _currentRow = 0;
   int _currentCol = 0;
   List<String> _wordList = [];
+  List<List<Color?>> _colors =
+      List.generate(6, (_) => List.generate(5, (_) => Colors.white));
 
   @override
   void initState() {
@@ -104,15 +106,18 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       setState(() {
         _selectedDate = pickedDate;
         word2solve = word;
-        _letters = List.generate(
-          6,
-          (_) => List.generate(5, (_) => null),
-        );
-        _currentRow = 0;
-        _currentCol = 0;
+        _clearRows(); // Clear all rows when a new date is picked
       });
       print('Word for selected date: $word2solve');
     }
+  }
+
+  void _clearRows() {
+    setState(() {
+      _letters = List.generate(6, (_) => List.generate(5, (_) => null));
+      _currentRow = 0;
+      _currentCol = 0;
+    });
   }
 
   void _handleKeyPress(String letter) {
@@ -140,34 +145,57 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       if (_currentCol >= 5) {
         String currentRowWord = _letters[_currentRow].join();
         if (_wordList.contains(currentRowWord)) {
-          print('Word "$currentRowWord" is in the list.');
-          // Move to the next row if Enter is pressed and the current row is filled
+          List<int> codes = generateCodes(currentRowWord, word2solve!);
+          debugPrint('Codes for "$currentRowWord" vs "$word2solve": $codes');
+
+          // Change the background color of the widgets based on the codes
+          _updateRowColors(_currentRow, codes);
+
           if (_currentRow < 5) {
-            // Ensure there are more rows to move to
             _currentRow++;
-            _currentCol = 0; // Reset to the first column of the next row
+            _currentCol = 0;
           }
         } else {
-          print('Word "$currentRowWord" is not in the list.');
-          // Show AlertDialog with the invalid word message
-          _showAlertDialog(context);
+          _showAlertDialog('Invalid Word !!!');
         }
       }
     });
   }
 
-  void _showAlertDialog(BuildContext context) {
+  void _updateRowColors(int rowIndex, List<int> codes) {
+    if (rowIndex >= 0 && rowIndex < 6 && codes.length == 5) {
+      setState(() {
+        _colors[rowIndex] =
+            List.generate(5, (index) => _getColorForCode(codes[index]));
+      });
+    }
+  }
+
+  Color _getColorForCode(int code) {
+    switch (code) {
+      case 3:
+        return Colors.green;
+      case 1:
+      case 2:
+        return Colors.yellow;
+      case 0:
+        return Colors.grey;
+      default:
+        return Colors.white;
+    }
+  }
+
+  void _showAlertDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Invalid Word'),
-          content: Text('The word you entered is not in the list.'),
-          actions: <Widget>[
+          content: Text(message),
+          actions: [
             TextButton(
-              child: Text('OK'),
+              child: Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -203,6 +231,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                               decoration: BoxDecoration(
                                 border: Border.all(
                                     color: Colors.black), // Black border
+                                color: _colors[i]
+                                    [index], // Set background color
                               ),
                               child: Center(
                                 child: Text(
