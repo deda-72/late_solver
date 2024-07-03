@@ -3,18 +3,22 @@ import 'package:http/http.dart' as http;
 import 'wordle_arch.dart'; // Import the wordle_arch.dart file
 import 'get_codes.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: DatePickerScreen(),
     );
   }
 }
 
 class DatePickerScreen extends StatefulWidget {
+  const DatePickerScreen({super.key});
+
   @override
   _DatePickerScreenState createState() => _DatePickerScreenState();
 }
@@ -64,7 +68,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   }
 
   Future<void> _loadWordList() async {
-    final url =
+    const url =
         'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/Possible_guesses.txt'; // Replace with your GitHub raw file URL
     try {
       final response = await http.get(Uri.parse(url));
@@ -178,10 +182,10 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text("Good Job"),
+          content: const Text("Good Job"),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
                 _clearRows(); // Clear all rows when "OK" is clicked
@@ -225,7 +229,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           content: Text(message),
           actions: [
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -240,13 +244,13 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Date Picker Example'),
+        title: const Text('Date Picker Example'),
       ),
       body: Column(
         children: [
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -256,7 +260,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(5, (index) {
                             return Container(
-                              margin: EdgeInsets.all(
+                              margin: const EdgeInsets.all(
                                   2.0), // Reduced margin for better spacing
                               width: 50.0, // Reduced width of each square
                               height: 50.0, // Reduced height of each square
@@ -270,20 +274,20 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                                 child: Text(
                                   _letters[i][index] ??
                                       '', // Display the letter if present
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 16), // Reduced font size
                                 ),
                               ),
                             );
                           }),
                         ),
-                      SizedBox(
+                      const SizedBox(
                           height: 20), // Space between the rows and the button
                       ElevatedButton(
                         onPressed: () => _selectDate(context),
                         child: Text(
-                          '${_selectedDate.toLocal().toString().split(' ')[0]}', // Display date on button
-                          style: TextStyle(fontSize: 16),
+                          _selectedDate.toLocal().toString().split(' ')[0], // Display date on button
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
                     ],
@@ -292,7 +296,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           // QWERTY Keyboard at the bottom
           Container(
             color: Colors.grey[200], // Background color for the keyboard
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
                 // QWERTY rows
@@ -304,8 +308,9 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(10, (index) {
                       String letter = '';
-                      if (index < 10)
+                      if (index < 10) {
                         letter = 'QWERTYUIOP'.substring(index, index + 1);
+                      }
                       return GestureDetector(
                         onTap: () => _handleKeyPress(letter),
                         child: Container(
@@ -317,14 +322,14 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
                     }),
                   ),
                 ),
-                SizedBox(height: 4.0), // Space between rows
+                const SizedBox(height: 4.0), // Space between rows
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
@@ -333,8 +338,9 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(9, (index) {
                       String letter = '';
-                      if (index < 9)
+                      if (index < 9) {
                         letter = 'ASDFGHJKL'.substring(index, index + 1);
+                      }
                       return GestureDetector(
                         onTap: () => _handleKeyPress(letter),
                         child: Container(
@@ -346,14 +352,14 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
                     }),
                   ),
                 ),
-                SizedBox(height: 4.0), // Space between rows
+                const SizedBox(height: 4.0), // Space between rows
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
@@ -362,8 +368,9 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(7, (index) {
                       String letter = '';
-                      if (index < 7)
+                      if (index < 7) {
                         letter = 'ZXCVBNM'.substring(index, index + 1);
+                      }
                       return GestureDetector(
                         onTap: () => _handleKeyPress(letter),
                         child: Container(
@@ -375,14 +382,14 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
                     }),
                   ),
                 ),
-                SizedBox(height: 8.0), // Space between rows
+                const SizedBox(height: 8.0), // Space between rows
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -390,29 +397,29 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     GestureDetector(
                       onTap: _handleBackspace,
                       child: Container(
-                        margin: EdgeInsets.all(4.0),
+                        margin: const EdgeInsets.all(4.0),
                         width: 40.0, // Reduced width of the Backspace button
                         height: 40.0, // Reduced height of the Backspace button
                         color: Colors.grey[300],
                         alignment: Alignment.center,
-                        child: Text(
+                        child: const Text(
                           '⌫', // Backspace icon
                           style: TextStyle(fontSize: 20), // Adjust font size
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                         width: 8.0), // Space between Backspace and Enter button
                     // Enter button
                     GestureDetector(
                       onTap: _handleEnter,
                       child: Container(
-                        margin: EdgeInsets.all(4.0),
+                        margin: const EdgeInsets.all(4.0),
                         width: 80.0, // Reduced width of the Enter button
                         height: 40.0, // Reduced height of the Enter button
                         color: Colors.grey[300],
                         alignment: Alignment.center,
-                        child: Text(
+                        child: const Text(
                           'Enter', // Enter text
                           style: TextStyle(fontSize: 16), // Reduced font size
                         ),

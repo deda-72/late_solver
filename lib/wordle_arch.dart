@@ -3,13 +3,13 @@ import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 
 Future<List<Map<String, dynamic>>> fetchCsvData() async {
-  final String csvUrl =
+  const String csvUrl =
       'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/wordle_archive.csv';
   final response = await http.get(Uri.parse(csvUrl));
 
   if (response.statusCode == 200) {
     final List<List<dynamic>> csvData =
-        CsvToListConverter().convert(response.body);
+        const CsvToListConverter().convert(response.body);
     final List<Map<String, dynamic>> dataList = [];
     final DateFormat dateFormat =
         DateFormat('M/d/yyyy'); // Adjust the format to match your date format

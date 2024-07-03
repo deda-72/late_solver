@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<List<List<String>>> readCSV() async {
-  final url =
+  const url =
       'https://raw.githubusercontent.com/deda-72/WORDLE-archive/main/wordle_archive.csv';
   final response = await http.get(Uri.parse(url));
 
