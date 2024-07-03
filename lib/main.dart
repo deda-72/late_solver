@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'wordle_arch.dart'; // Import the wordle_arch.dart file
+import 'get_codes.dart';
 
 void main() => runApp(MyApp());
 
