@@ -107,6 +107,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
         _selectedDate = pickedDate;
         word2solve = word;
         _clearRows(); // Clear all rows when a new date is picked
+        _resetColors(); // Reset background colors to white
       });
       print('Word for selected date: $word2solve');
     }
@@ -117,6 +118,12 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       _letters = List.generate(6, (_) => List.generate(5, (_) => null));
       _currentRow = 0;
       _currentCol = 0;
+    });
+  }
+
+  void _resetColors() {
+    setState(() {
+      _colors = List.generate(6, (_) => List.generate(5, (_) => Colors.white));
     });
   }
 
@@ -147,19 +154,44 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
         if (_wordList.contains(currentRowWord)) {
           List<int> codes = generateCodes(currentRowWord, word2solve!);
           debugPrint('Codes for "$currentRowWord" vs "$word2solve": $codes');
-
-          // Change the background color of the widgets based on the codes
-          _updateRowColors(_currentRow, codes);
-
-          if (_currentRow < 5) {
-            _currentRow++;
-            _currentCol = 0;
+          if (codes.every((code) => code == 3)) {
+            _updateRowColors(
+                _currentRow, codes); // Update row colors based on codes
+            _showGoodJobDialog();
+          } else {
+            _updateRowColors(
+                _currentRow, codes); // Update row colors based on codes
+            if (_currentRow < 5) {
+              _currentRow++;
+              _currentCol = 0;
+            }
           }
         } else {
           _showAlertDialog('Invalid Word !!!');
         }
       }
     });
+  }
+
+  void _showGoodJobDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text("Good Job"),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _clearRows(); // Clear all rows when "OK" is clicked
+                _resetColors();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _updateRowColors(int rowIndex, List<int> codes) {
@@ -226,8 +258,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             return Container(
                               margin: EdgeInsets.all(
                                   2.0), // Reduced margin for better spacing
-                              width: 40.0, // Reduced width of each square
-                              height: 40.0, // Reduced height of each square
+                              width: 50.0, // Reduced width of each square
+                              height: 50.0, // Reduced height of each square
                               decoration: BoxDecoration(
                                 border: Border.all(
                                     color: Colors.black), // Black border
@@ -269,7 +301,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 2.0, // Reduced spacing between keys
-                    runSpacing: 2.0, // Reduced spacing between rows
+                    runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(10, (index) {
                       String letter = '';
                       if (index < 10)
@@ -281,8 +313,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                           ),
-                          width: 30.0, // Reduced width of each key
-                          height: 30.0, // Reduced height of each key
+                          width: 35.0, // Reduced width of each key
+                          height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: TextStyle(fontSize: 14), // Reduced font size
@@ -292,12 +324,13 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     }),
                   ),
                 ),
+                SizedBox(height: 4.0), // Space between rows
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 2.0, // Reduced spacing between keys
-                    runSpacing: 2.0, // Reduced spacing between rows
+                    runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(9, (index) {
                       String letter = '';
                       if (index < 9)
@@ -309,8 +342,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                           ),
-                          width: 30.0, // Reduced width of each key
-                          height: 30.0, // Reduced height of each key
+                          width: 35.0, // Reduced width of each key
+                          height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: TextStyle(fontSize: 14), // Reduced font size
@@ -320,12 +353,13 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     }),
                   ),
                 ),
+                SizedBox(height: 4.0), // Space between rows
                 Container(
                   alignment: Alignment.center,
                   child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 2.0, // Reduced spacing between keys
-                    runSpacing: 2.0, // Reduced spacing between rows
+                    runSpacing: 10.0, // Reduced spacing between rows
                     children: List.generate(7, (index) {
                       String letter = '';
                       if (index < 7)
@@ -337,8 +371,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                           ),
-                          width: 30.0, // Reduced width of each key
-                          height: 30.0, // Reduced height of each key
+                          width: 35.0, // Reduced width of each key
+                          height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: TextStyle(fontSize: 14), // Reduced font size
@@ -348,6 +382,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                     }),
                   ),
                 ),
+                SizedBox(height: 8.0), // Space between rows
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -374,7 +409,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                       child: Container(
                         margin: EdgeInsets.all(4.0),
                         width: 80.0, // Reduced width of the Enter button
-                        height: 40.0, // Reduced height of the Enter button
+                        height: 80.0, // Reduced height of the Enter button
                         color: Colors.grey[300],
                         alignment: Alignment.center,
                         child: Text(
