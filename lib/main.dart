@@ -103,6 +103,12 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       setState(() {
         _selectedDate = pickedDate;
         word2solve = word;
+        _letters = List.generate(
+          6,
+          (_) => List.generate(5, (_) => null),
+        );
+        _currentRow = 0;
+        _currentCol = 0;
       });
       print('Word for selected date: $word2solve');
     }
@@ -142,24 +148,31 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
           }
         } else {
           print('Word "$currentRowWord" is not in the list.');
-          // Show SnackBar with the invalid word message and an OK button
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid Word !!!'),
-              backgroundColor: Colors.red, // Optional: to highlight the error
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors
-                    .white, // Optional: to change the text color of the button
-                onPressed: () {
-                  // SnackBar will automatically dismiss when the button is pressed
-                },
-              ),
-            ),
-          );
+          // Show AlertDialog with the invalid word message
+          _showAlertDialog(context);
         }
       }
     });
+  }
+
+  void _showAlertDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invalid Word'),
+          content: Text('The word you entered is not in the list.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
