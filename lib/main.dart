@@ -212,6 +212,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       case 3:
         return Colors.green;
       case 1:
+        return Colors.grey;
       case 2:
         return Colors.yellow;
       case 0:
@@ -286,7 +287,10 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                       ElevatedButton(
                         onPressed: () => _selectDate(context),
                         child: Text(
-                          _selectedDate.toLocal().toString().split(' ')[0], // Display date on button
+                          _selectedDate
+                              .toLocal()
+                              .toString()
+                              .split(' ')[0], // Display date on button
                           style: const TextStyle(fontSize: 16),
                         ),
                       ),
@@ -322,7 +326,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: const TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(
+                                fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
@@ -352,7 +357,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: const TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(
+                                fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
@@ -382,7 +388,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           height: 35.0, // Reduced height of each key
                           child: Text(
                             letter,
-                            style: const TextStyle(fontSize: 14), // Reduced font size
+                            style: const TextStyle(
+                                fontSize: 14), // Reduced font size
                           ),
                         ),
                       );
