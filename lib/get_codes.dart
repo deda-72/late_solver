@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart'; // Import the foundation library
-
 List<int> generateCodes(String word1, String word2) {
   List<int> codes = List<int>.filled(word1.length, 0);
   //Map<String, int> countWord1 = countOccurrences(word1);
@@ -35,9 +33,9 @@ List<int> generateCodes(String word1, String word2) {
     }
   }
 
-  debugPrint('Word1: $word1');
-  debugPrint('Word2: $word2');
-  debugPrint('Codes: $codes');
+  //debugPrint('Word1: $word1');
+  //debugPrint('Word2: $word2');
+  //debugPrint('Codes: $codes');
 
   return codes;
 }

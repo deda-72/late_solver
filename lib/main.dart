@@ -212,9 +212,9 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
       case 3:
         return Colors.green;
       case 1:
-        return Colors.grey;
-      case 2:
         return Colors.yellow;
+      case 2:
+        return Colors.grey;
       case 0:
         return Colors.grey;
       default:
