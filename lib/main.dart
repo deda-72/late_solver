@@ -303,7 +303,13 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Date Picker Example'),
+        title: const Text('Late WORDLE Solver'),
+        centerTitle: true, // Center the title
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Colors.blue, // Change this to the desired color
+          ),
+        ),
       ),
       body: Column(
         children: [
