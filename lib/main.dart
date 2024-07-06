@@ -412,8 +412,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             color: _colorMap[_keyColors[letter] ?? -1] ??
                                 Colors.white, // Use color map
                           ),
-                          width: 35.0, // Reduced width of each key
-                          height: 35.0, // Reduced height of each key
+                          width: 33.0, // Reduced width of each key
+                          height: 33.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
@@ -445,8 +445,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             color: _colorMap[_keyColors[letter] ?? -1] ??
                                 Colors.white, // Use color map
                           ),
-                          width: 35.0, // Reduced width of each key
-                          height: 35.0, // Reduced height of each key
+                          width: 33.0, // Reduced width of each key
+                          height: 33.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
@@ -478,8 +478,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             color: _colorMap[_keyColors[letter] ?? -1] ??
                                 Colors.white, // Use color map
                           ),
-                          width: 35.0, // Reduced width of each key
-                          height: 35.0, // Reduced height of each key
+                          width: 33.0, // Reduced width of each key
+                          height: 33.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
