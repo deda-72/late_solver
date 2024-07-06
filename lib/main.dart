@@ -24,6 +24,51 @@ class DatePickerScreen extends StatefulWidget {
 }
 
 class _DatePickerScreenState extends State<DatePickerScreen> {
+  final Map<String, int> _keyColors = {
+    'Q': -1,
+    'W': -1,
+    'E': -1,
+    'R': -1,
+    'T': -1,
+    'Y': -1,
+    'U': -1,
+    'I': -1,
+    'O': -1,
+    'P': -1,
+    'A': -1,
+    'S': -1,
+    'D': -1,
+    'F': -1,
+    'G': -1,
+    'H': -1,
+    'J': -1,
+    'K': -1,
+    'L': -1,
+    'Z': -1,
+    'X': -1,
+    'C': -1,
+    'V': -1,
+    'B': -1,
+    'N': -1,
+    'M': -1,
+  };
+
+  // Define your color map
+  final Map<int, Color> _colorMap = {
+    -1: Colors.white, // Default color for uninitialized state
+    0: Colors.grey, // Not in word
+    1: Colors.yellow, // In word but in wrong position
+    2: Colors.grey, // Incorrect, adjust as needed
+    3: Colors.green, // Correct
+  };
+
+  // Method to reset _keyColors
+  void _resetKeyColors() {
+    setState(() {
+      _keyColors.updateAll((key, value) => -1);
+    });
+  }
+
   DateTime _selectedDate = DateTime.now(); // Initial date
   List<DateTime> _activeDates = [];
   String? word2solve;
@@ -112,6 +157,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
         word2solve = word;
         _clearRows(); // Clear all rows when a new date is picked
         _resetColors(); // Reset background colors to white
+        _resetKeyColors(); // Reset key colors to initial state
       });
       print('Word for selected date: $word2solve');
     }
@@ -158,6 +204,18 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
         if (_wordList.contains(currentRowWord)) {
           List<int> codes = generateCodes(currentRowWord, word2solve!);
           debugPrint('Codes for "$currentRowWord" vs "$word2solve": $codes');
+
+          // Update key colors based on the current row's guess
+          for (int i = 0; i < currentRowWord.length; i++) {
+            String key = currentRowWord[i];
+            int newCode = codes[i];
+
+            // Only update if the new code is greater than the current one
+            if (_keyColors[key]! < newCode) {
+              _keyColors[key] = newCode;
+            }
+          }
+
           if (codes.every((code) => code == 3)) {
             _updateRowColors(
                 _currentRow, codes); // Update row colors based on codes
@@ -188,8 +246,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
-                _clearRows(); // Clear all rows when "OK" is clicked
-                _resetColors();
+                //_clearRows(); // Clear all rows when "OK" is clicked
+                //_resetColors();
               },
             ),
           ],
@@ -321,6 +379,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
+                            color: _colorMap[_keyColors[letter] ?? -1] ??
+                                Colors.white, // Use color map
                           ),
                           width: 35.0, // Reduced width of each key
                           height: 35.0, // Reduced height of each key
@@ -352,6 +412,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
+                            color: _colorMap[_keyColors[letter] ?? -1] ??
+                                Colors.white, // Use color map
                           ),
                           width: 35.0, // Reduced width of each key
                           height: 35.0, // Reduced height of each key
@@ -383,6 +445,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
+                            color: _colorMap[_keyColors[letter] ?? -1] ??
+                                Colors.white, // Use color map
                           ),
                           width: 35.0, // Reduced width of each key
                           height: 35.0, // Reduced height of each key
