@@ -226,6 +226,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
             if (_currentRow < 5) {
               _currentRow++;
               _currentCol = 0;
+            } else {
+              _showTakeItEasyDialog();
             }
           }
         } else {
@@ -291,6 +293,28 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showTakeItEasyDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: const Text("Take it easy. It's just a game"),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                //_clearRows(); // Clear all rows
+                //_resetColors(); // Reset background colors to white
+                //_resetKeyColors(); // Reset key colors
               },
             ),
           ],
