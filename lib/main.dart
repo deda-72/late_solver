@@ -245,7 +245,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Date Picker Example'),
+        title: const Text('Late WORDLE Solver'),
       ),
       body: Column(
         children: [
@@ -322,8 +322,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black),
                           ),
-                          width: 35.0, // Reduced width of each key
-                          height: 35.0, // Reduced height of each key
+                          width: 33.0, // Reduced width of each key
+                          height: 33.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
