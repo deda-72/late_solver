@@ -445,8 +445,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             color: _colorMap[_keyColors[letter] ?? -1] ??
                                 Colors.white, // Use color map
                           ),
-                          width: 33.0, // Reduced width of each key
-                          height: 33.0, // Reduced height of each key
+                          width: 31.0, // Reduced width of each key
+                          height: 31.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
@@ -478,8 +478,8 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                             color: _colorMap[_keyColors[letter] ?? -1] ??
                                 Colors.white, // Use color map
                           ),
-                          width: 33.0, // Reduced width of each key
-                          height: 33.0, // Reduced height of each key
+                          width: 31.0, // Reduced width of each key
+                          height: 31.0, // Reduced height of each key
                           child: Text(
                             letter,
                             style: const TextStyle(
@@ -500,7 +500,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                       child: Container(
                         margin: const EdgeInsets.all(4.0),
                         width: 40.0, // Reduced width of the Backspace button
-                        height: 33.0, // Reduced height of the Backspace button
+                        height: 31.0, // Reduced height of the Backspace button
                         color: Colors.grey[300],
                         alignment: Alignment.center,
                         child: const Text(
@@ -517,7 +517,7 @@ class _DatePickerScreenState extends State<DatePickerScreen> {
                       child: Container(
                         margin: const EdgeInsets.all(4.0),
                         width: 80.0, // Reduced width of the Enter button
-                        height: 33.0, // Reduced height of the Enter button
+                        height: 31.0, // Reduced height of the Enter button
                         color: Colors.grey[300],
                         alignment: Alignment.center,
                         child: const Text(
